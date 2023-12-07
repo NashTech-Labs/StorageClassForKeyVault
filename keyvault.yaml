@@ -1,0 +1,31 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azure-keyvault
+provisioner: secrets-store.csi.k8s.io
+parameters:
+  secretProviderClass: "azurekeyvault-secrets"
+
+---
+
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: azurekeyvault-secrets
+spec:
+  provider: azure
+  parameters:
+    usePodIdentity: "false"  # Set to "true" if using Azure Managed Identity for AKS
+    useVMManagedIdentity: "false"  # Set to "true" if using Azure VM Managed Identity
+    userAssignedIdentityID: ""  # Provide User Assigned Identity ID if usePodIdentity is "true"
+    keyvaultName: "<YourKeyVaultName>"
+    cloudName: "AzurePublicClous" 
+    objects:  |
+      array:
+        - |
+          objectName: "<YourSecretName>"
+          objectType: secret
+          objectVersion: "<YourSecretVersion>" #or you can keep it empty
+    resourceGroup: "<YourResourceGroupName>"
+    tenantID: "<the tenant ID of the key vault>" 
+  
